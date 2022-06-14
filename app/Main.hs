@@ -25,9 +25,15 @@ two = Color orange $ Circle 50
 
 draw :: Float -> Picture
 draw t
-   | t <= 0.5    = blank                                                -- in the first second
-   | t <= 3.1   = pictures [Translate 80 0 one]                        -- between 1s and 2s
+   | t <= 0.1    = blank                                                -- in the first second
+   | t <= 0.2   = pictures [Translate 80 0 one]                        -- between 1s and 2s
    | otherwise = pictures [Translate 80 0 one, Translate (-80) 0 two] -- afterwards
 
+window :: Display
+window = InWindow "Microcontroller" (640, 480) (100, 100)
+
 main :: IO ()
-main = animate (InWindow "Microcontroller" (640, 480) (100, 100)) azure (draw)
+main = animate window azure (draw)
+
+
+-- https://github.com/MondayMorningHaskell/SimpleMaze/blob/main/SimpleMaze.cabal
