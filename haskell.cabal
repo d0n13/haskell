@@ -1,0 +1,37 @@
+cabal-version:      2.4
+name:               haskell
+version:            0.1.0.0
+homepage:           https://github.com/d0n13/haskell
+
+synopsis: A truster control system for a dual truster boat
+description: Controls two trusters on a boat, handles stick movements and translates to forwards, backwards and left and right. Handles master arming and drives a display with remaing battery, speed and truster positions.
+
+author:             Donie Kelly
+maintainer:         donie.kelly@gmail.com
+build-type:         Simple
+copyright:          Copyright 2022 Donie Kelly
+
+extra-source-files:
+    CHANGELOG.md
+    README.md
+
+library
+    exposed-modules:
+        Truster
+        Control
+    
+    build-depends:    base ^>=4.14.3.0
+    hs-source-dirs:   src
+    default-language: Haskell2010
+    
+executable haskell
+    main-is: Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:    base ^>=4.14.3.0, ansi-terminal, mtl, gloss
+    hs-source-dirs:   app
+    default-language: Haskell2010
