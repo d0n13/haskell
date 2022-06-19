@@ -52,7 +52,7 @@ runController chan = forever $ do
         _  -> return ()
 
 -- Arm or disarm the controller
--- Only allows state to change once per seconds -- handle time difference between last press and now
+-- Only allows state to change once every two seconds -- handle time difference between last press and now
 armController :: MonadState Controller m => m ()
 armController = do
    controller <- get
