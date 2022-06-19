@@ -56,17 +56,17 @@ runController chan = forever $ do
 armController :: MonadState Controller m => m ()
 armController = do
    controller <- get
-   let isArmed = armed controller
-   let lastPressed = lastArmed controller
-   let now = getSystemTime
-   setArmed isArmed lastPressed now controller
+   let isArmed = armed controller               -- Current armed state
+   let lastPressed = lastArmed controller       -- When was arm last pressed
+   let now = getSystemTime                      -- current system time in seconds
+   setArmed isArmed lastPressed now controller  -- set armed state if time between last press and now is > 2 secs
    where
       setArmed armState last now controller =
          when (last + 2 >= now) $
          if armState == On then
-            put $ controller {armed = Off, lastArmed = now}
+            put $ controller {armed = Off, lastArmed = now} -- update state to OFF
          else
-            put $ controller {armed = On, lastArmed = now}
+            put $ controller {armed = On, lastArmed = now} -- update state to ON
 
 -- moveJoystick :: MonadState Controller m => JoystickMove -> m ()
 -- moveJoystick direction = do 
