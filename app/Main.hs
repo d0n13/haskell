@@ -6,19 +6,20 @@ import Data.Time
 import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State
-import Control.Concurrent 
+import Control.Concurrent
 import Graphics.Gloss
 import Graphics.Gloss.Data.ViewState (CommandConfig)
 import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
 
 --- Main
-main :: IO ()
+--main :: IO ()
 main = do
    controller <- initController
    config <- initConfig
    chan <- newChan
    forkIO $ castTick chan
-   putStr $ "tick"
+   forkIO $ castKey chan
+   runStateT (runReaderT (runController chan) config) controller
 
 --main = animate window azure (draw)
 
@@ -55,10 +56,18 @@ runController chan = forever $ do
 armController :: MonadState Controller m => m ()
 armController = do
    controller <- get
-   let isArmed = armed controller 
-   let timePressed = getSystemTime
-   put $ controller {armed = isArmed, lastArmed = timePressed}
-   return ()
+   let isArmed = armed controller
+   let lastPressed = lastArmed controller
+   let now = getSystemTime
+   setArmed isArmed lastPressed now controller
+   --put $ controller {armed = setArmed isArmed lastPressed now, lastArmed = timePressed}
+   where
+      setArmed armState last now controller =
+         when (last + 2 >= now) $
+         if armState == On then
+            put $ controller {armed = Off, lastArmed = now}
+         else
+            put $ controller {armed = On, lastArmed = now}
 
 -- moveJoystick :: MonadState Controller m => JoystickMove -> m ()
 -- moveJoystick direction = do 
@@ -74,13 +83,13 @@ data JoystickMove = U | D | L | R deriving Show
 data Armed        = On | Off deriving Show
 type Battery      = Int
 type PowerLevel   = Int
-data PowerLimit   = Low | Medium | High deriving Show 
+data PowerLimit   = Low | Medium | High deriving Show
 
 data Event
   = TickEvent
   | KeyEvent Char deriving Show
 
-data Controller   = Controller 
+data Controller   = Controller
    {
       axis           :: Joystick,   -- Joystick axis (x,y) 0-100% 50% is center
       armed          :: Armed,      -- On off switch, inputs have no response when not armed
@@ -93,7 +102,7 @@ data Controller   = Controller
 
 initController :: IO Controller
 initController = do
-   timeNow <- getSystemTime 
+   timeNow <- getSystemTime
    return $ Controller
       {
          axis              = Joystick (50, 50),
