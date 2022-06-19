@@ -65,8 +65,6 @@ armController = do
 --    contoller <- get
 --    let (x, y) = axis controller
 
-
-
 -- Joystic center position (50%, 50%) is no trottle and mid steering
 -- Joystick left and right control the truster position which
 -- rotate around their center positions by a configurabele limit
@@ -89,7 +87,7 @@ data Controller   = Controller
       lastArmed      :: SystemTime, -- Time the arm button was last pressed. Arm or disarm must be debounced
       trusterPower   :: PowerLevel, -- Truster power level 0-100%
       batteryLevel   :: Battery,    -- Current battery percentage
-      batteryLowLevel:: Battery,    -- Low battery level warning level
+      batteryLowLevel:: Battery,    -- Low battery level warning level - truster enters low power mode
       batteryShutdown:: Battery     -- Battery shutdown level, disarms controller
    }
 
@@ -109,7 +107,7 @@ initController = do
 
 data Config       = Config
    {
-      trusterMaxTurn :: Int,        -- Maximum amoutn truster can turn left or right
+      trusterMaxTurn :: Int,        -- Maximum amount truster can turn left or right in degrees
       powerLimit     :: PowerLimit  -- Max amount of power available (low, med, high)
    }
    deriving Show
@@ -119,9 +117,11 @@ initConfig = do
   return $ Config
     {
       trusterMaxTurn = 45,
-      powerLimit = Low
+      powerLimit = High
     }
 
+
+-- scratch space for graphics. Adding later. 
 circles = pictures [Translate 80 0 one, Translate (-80) 0 two]
 one = Color yellow $ Circle 80
 two = Color orange $ Circle 50
