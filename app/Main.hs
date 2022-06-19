@@ -60,7 +60,6 @@ armController = do
    let lastPressed = lastArmed controller
    let now = getSystemTime
    setArmed isArmed lastPressed now controller
-   --put $ controller {armed = setArmed isArmed lastPressed now, lastArmed = timePressed}
    where
       setArmed armState last now controller =
          when (last + 2 >= now) $
