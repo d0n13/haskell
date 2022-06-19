@@ -8,7 +8,6 @@ import Control.Monad.Reader
 import Control.Monad.State
 import Control.Concurrent
 import Graphics.Gloss
-import Graphics.Gloss.Data.ViewState (CommandConfig)
 import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
 
 --- Main
