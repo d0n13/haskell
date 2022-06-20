@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Configuration where
 
-import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
+import Data.Time
 
 -- Joystic center position (50%, 50%) is no trottle and mid steering
 -- Joystick left and right control the truster positions which
@@ -21,8 +21,9 @@ data Event
 data Controller   = Controller
    {
       axis           :: Joystick,   -- Joystick axis (x,y) 0-100% 50% is center
-      armed          :: Armed,      -- On off switch, inputs have no response when not armed
-      lastArmed      :: SystemTime, -- Time the arm button was last pressed. Arm or disarm must be debounced
+      armed          :: Bool,       -- On off switch, inputs have no response when not armed
+      lastArmed      :: UTCTime,    -- Time the arm button was last pressed. Arm or disarm must be debounced
+      armPressed     :: UTCTime,    -- Time user presses arm
       trusterPower   :: PowerLevel, -- Truster power level 0-100%
       batteryLevel   :: Battery,    -- Current battery percentage
       batteryLowLevel:: Battery,    -- Low battery level warning level - truster enters low power mode
@@ -32,12 +33,13 @@ data Controller   = Controller
 
 initController :: IO Controller
 initController = do
-   timeNow <- getSystemTime
+   timeNow <- getCurrentTime
    return $ Controller
       {
          axis              = Joystick (50, 50), -- centered
-         armed             = Off,               -- controller off
+         armed             = False,             -- controller off
          lastArmed         = timeNow,           -- can't arm within two seconds from now
+         armPressed        = timeNow,           -- can't arm within two seconds from now
          trusterPower      = 0,
          batteryLevel      = 100,
          batteryLowLevel   = 10,

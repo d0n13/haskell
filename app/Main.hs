@@ -12,23 +12,32 @@ import Graphics.Gloss
 import Truster
 import Controller
 import Configuration 
+import Data.Time (getCurrentTime)
 
 --- Main
---main :: IO ()
+-- main :: IO ()
 main = do
-   controller <- initController
-   config <- initConfig
-   chan <- newChan
-   forkIO $ castTick chan
-   forkIO $ castKey chan
-   runStateT (runReaderT (runController chan) config) controller
+  --InWindow "Microcontroller" (640, 480) (100, 100)
+  controller <- initController
+  config <- initConfig
+  setNoBuffering
+  chan <- newChan
+  forkIO $ castTick chan
+  forkIO $ castKey chan
+  runStateT (runReaderT (runController chan) config) controller
 
 --main = animate window azure (draw)
+
+-- util
+setNoBuffering :: IO ()
+setNoBuffering = do
+  hSetBuffering stdin NoBuffering
+  hSetBuffering stdout NoBuffering
 
 -- Generate a tick event every 50ms to get 20fps
 castTick :: Chan Event -> IO ()
 castTick chan = forever $ do
-  threadDelay (50 ^ 4)
+  threadDelay (10 ^ 5)
   writeChan chan TickEvent
 
 -- Read the keyboard
@@ -41,12 +50,23 @@ castKey chan = forever $ do
 -- Controller loop
 runController :: Chan Event -> ReaderT Config (StateT Controller IO) ()
 runController chan = forever $ do
+  controller <- get
   event <- liftIO $ readChan chan
+  let now   = armPressed controller
+  let isArmed = armed controller
+  let lastArmed = lastArmed controller
+  let armPressed = armPressed controller
+  -- let now = getCurrentTime
   case event of
-    TickEvent   -> do liftIO (putStr "tick"); return () -- here we update the graphics as requried
+
+    TickEvent   -> do 
+      liftIO $ print "Armed: " + isArmed
+      return ()
+
     KeyEvent k  -> do
+      -- liftIO $ print k
       case k of
-        'a' -> armController
+        'a' -> armController now
       --   'w' -> moveJoystick U
       --   's' -> moveJoystick D
       --   'j' -> moveJoystick L
@@ -64,8 +84,8 @@ draw t
    | t <= 0.2   = pictures [Translate 80 0 one]                       -- between 1s and 2s
    | otherwise = pictures [Translate 80 0 one, Translate (-80) 0 two] -- afterwards
 
-window :: Display
-window = InWindow "Microcontroller" (640, 480) (100, 100)
+createWindow :: Display
+createWindow = InWindow "Microcontroller" (640, 480) (100, 100)
 
 
 

@@ -5,26 +5,51 @@ import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State
 import Graphics.Gloss
-import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
+import Data.Time.Clock
+import Debug.Trace
 
 import Configuration
 
 -- Arm or disarm the controller
 -- Only allows state to change once every two seconds -- handle time difference between last press and now
-armController :: MonadState Controller m => m ()
-armController = do
+armController :: MonadState Controller m => UTCTime -> m ()
+armController now = do
    controller <- get
    let isArmed = armed controller               -- Current armed state
    let lastPressed = lastArmed controller       -- When was arm last pressed
-   let now = getSystemTime                      -- current system time in seconds
-   setArmed isArmed lastPressed now controller  -- set armed state if time between last press and now is > 2 secs
-   where
-      setArmed armState last now controller =
-         when (last + 2 >= now) $
-         if armState == On then
-            put $ controller {armed = Off, lastArmed = now} -- update state to OFF
-         else
-            put $ controller {armed = On, lastArmed = now} -- update state to ON
+   let diff = (addUTCTime 2 lastPressed)        -- add 2 seconds to when last pressed
+   let diffOK = diff > now
+   case updateController diffOK of
+      True -> put (controller {armed = not isArmed, lastArmed = now})
+      False -> put controller
+   where 
+      updateController True = True
+      updateController False = False
+      
+   -- if diffOK then
+   --    if isArmed == On then
+   --       put (controller {armed = Off, lastArmed = now}) -- update state to OFF
+   --    else
+   --       put $ controller {armed = On, lastArmed = now} -- update state to ON
+   -- else 
+   --    put $ controller
+
+
+
+
+--    setArmed isArmed diff controller             -- set armed state if time between last press and now is > 2 secs
+--    where
+--       setArmed armState diff controller =
+--          if diff >= 2 then
+--             if (armState == On) then
+--                put (controller {armed = Off, lastArmed = now}) -- update state to OFF
+--             else
+--                put $ controller {armed = On, lastArmed = now} -- update state to ON
+--          else 
+--             return ()
+
+-- addSeconds :: NominalDiffTime -> UTCTime -> UTCTime
+-- addSeconds seconds = addUTCTime (seconds)
 
 
 -- moveJoystick :: MonadState Controller m => JoystickMove -> m ()
