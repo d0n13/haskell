@@ -53,10 +53,6 @@ runController chan = forever $ do
       --   'k' -> moveJoystick R
         _  -> return ()
 
-
-
-
-
 -- scratch space for graphics. Adding later. 
 circles = pictures [Translate 80 0 one, Translate (-80) 0 two]
 one = Color yellow $ Circle 80

@@ -4,6 +4,9 @@ module Truster where
 
 import Graphics.Gloss
 
+import Configuration
+
+
 orangeCircle = Color orange $ Circle 50
 
 -- Draw a truster at the specified angle

@@ -1,8 +1,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Control where
 
+import Control.Monad
+import Control.Monad.Reader
+import Control.Monad.State
 import Graphics.Gloss
 import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
+
+import Configuration
 
 -- Arm or disarm the controller
 -- Only allows state to change once every two seconds -- handle time difference between last press and now
@@ -31,5 +36,5 @@ redCircle = Color red $ Circle 50
 
 -- Draw a truster at the specified angle
 drawJoystickPosition :: Joystick -> Picture
-draw joystick =
-   pictures [Translate 80 0 orangeCircle]
+drawJoystickPosition joystick =
+   pictures [Translate 80 0 redCircle]
