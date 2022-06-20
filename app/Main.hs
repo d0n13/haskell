@@ -10,7 +10,7 @@ import Control.Concurrent
 import Graphics.Gloss
 
 import Truster
-import Control
+import Controller
 import Configuration 
 
 --- Main
