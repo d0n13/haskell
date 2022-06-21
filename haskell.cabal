@@ -27,6 +27,6 @@ executable haskell
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base, ansi-terminal, mtl, gloss, time
+    build-depends:    base, ansi-terminal, mtl, time
     hs-source-dirs:   app
     default-language: Haskell2010

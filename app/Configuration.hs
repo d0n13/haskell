@@ -14,13 +14,17 @@ type Battery      = Int
 type PowerLevel   = Int
 data PowerLimit   = Low | Medium | High deriving Show
 
+-- Rendering
+type ScreenPos    = (Int, Int)
+
+-- Events
 data Event
   = TickEvent
   | KeyEvent Char deriving Show
 
 data Controller   = Controller
    {
-      axis           :: Joystick,   -- Joystick axis (x,y) 0-100% 50% is center
+      joystick       :: Joystick,   -- Joystick axis (x,y) 0-100% 50% is center
       armed          :: Bool,       -- On off switch, inputs have no response when not armed
       lastArmed      :: UTCTime,    -- Time the arm button was last pressed. Arm or disarm must be debounced
       armPressed     :: UTCTime,    -- Time user presses arm
@@ -36,7 +40,7 @@ initController = do
    timeNow <- getCurrentTime
    return $ Controller
       {
-         axis              = Joystick (50, 50), -- centered
+         joystick          = Joystick (50, 50), -- centered
          armed             = False,             -- controller off
          lastArmed         = timeNow,           -- can't arm within two seconds from now
          armPressed        = timeNow,           -- can't arm within two seconds from now

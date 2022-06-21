@@ -4,9 +4,7 @@ module Controller where
 import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State
-import Graphics.Gloss
 import Data.Time.Clock
-import Debug.Trace
 
 import Configuration
 
@@ -25,41 +23,15 @@ armController now = do
    where 
       updateController True = True
       updateController False = False
-      
-   -- if diffOK then
-   --    if isArmed == On then
-   --       put (controller {armed = Off, lastArmed = now}) -- update state to OFF
-   --    else
-   --       put $ controller {armed = On, lastArmed = now} -- update state to ON
-   -- else 
-   --    put $ controller
 
-
-
-
---    setArmed isArmed diff controller             -- set armed state if time between last press and now is > 2 secs
---    where
---       setArmed armState diff controller =
---          if diff >= 2 then
---             if (armState == On) then
---                put (controller {armed = Off, lastArmed = now}) -- update state to OFF
---             else
---                put $ controller {armed = On, lastArmed = now} -- update state to ON
---          else 
---             return ()
-
--- addSeconds :: NominalDiffTime -> UTCTime -> UTCTime
--- addSeconds seconds = addUTCTime (seconds)
-
-
--- moveJoystick :: MonadState Controller m => JoystickMove -> m ()
--- moveJoystick direction = do 
---    contoller <- get
---    let (x, y) = axis controller
-
-redCircle = Color red $ Circle 50
-
--- Draw a truster at the specified angle
-drawJoystickPosition :: Joystick -> Picture
-drawJoystickPosition joystick =
-   pictures [Translate 80 0 redCircle]
+moveJoystick :: MonadState Controller m => JoystickMove -> m ()
+moveJoystick direction = do
+   controller <- get
+   let _axis = (getPosition . joystick) controller
+   -- let yAxis = snd axis controller
+   put (controller {joystick = Joystick (move direction _axis)})
+   where
+      move U (x, y) = (x, y + 2)
+      move D (x, y) = (x, y - 2)
+      move L (x, y) = (x - 2, y)
+      move R (x, y) = (x + 2, y)
