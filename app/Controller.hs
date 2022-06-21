@@ -12,6 +12,7 @@ import Control.Concurrent
 import Configuration
 import Joystick
 import Truster
+import Battery (renderBattery, reduceBatteryLevel)
 
 -- Controller loop
 runController :: Chan Event -> ReaderT Config (StateT Controller IO) ()
@@ -30,6 +31,10 @@ runController chan = forever $ do
       renderController
       return ()
 
+    BatterDrop  -> do
+      reduceBatteryLevel
+      return ()
+
     KeyEvent k  -> do
       case k of
         'a' -> armController now
@@ -38,7 +43,6 @@ runController chan = forever $ do
         'j' -> moveJoystick L
         'l' -> moveJoystick R
         _  -> return ()
-
 
 -- Arm or disarm the controller
 -- Only allows state to change once every two seconds -- handle time difference between last press and now
@@ -84,7 +88,7 @@ adjustPower :: MonadState Controller m => m ()
 adjustPower = do
    controller <- get
    let power = trusterPower controller
-   let limit = trusterLimit controller
+   let limit = powerLimit controller
    let powerLimit = getPowerLimit limit
    if power > powerLimit then
       put (controller { trusterPower = powerLimit})
@@ -96,7 +100,7 @@ getPowerLimit limit = do
    case limit of 
       Low      -> 25
       Medium   -> 70
-      High    -> 100  
+      High     -> 100  
 
 -- Render Armed status
 renderArmed :: ScreenPos -> Bool -> IO ()
@@ -121,6 +125,7 @@ renderController = do
   controller <- get
   liftIO $ renderArmed (2,2) (armed controller)
   liftIO $ renderJoystick (4,2) (joystick controller)
-  liftIO $ renderTruster (4,14) (trusterPower controller) (trusterAngle controller)
+  liftIO $ renderTruster (4,14) (trusterPower controller) (trusterAngle controller) (powerLimit controller)
+  liftIO $ renderBattery (4, 45) (batteryLevel controller)
   liftIO $ renderHelp (8, 2)
   return ()

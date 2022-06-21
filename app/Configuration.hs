@@ -21,6 +21,7 @@ type ScreenPos    = (Int, Int)
 -- Events
 data Event
   = TickEvent
+  | BatterDrop
   | KeyEvent Char deriving Show
 
 data Controller   = Controller
@@ -30,7 +31,7 @@ data Controller   = Controller
       lastArmed      :: UTCTime,    -- Time the arm button was last pressed. Arm or disarm must be debounced
       armPressed     :: UTCTime,    -- Time user presses arm
       trusterPower   :: PowerLevel, -- Truster power level 0-100%
-      trusterLimit   :: PowerLimit, -- Truster power limit
+      powerLimit     :: PowerLimit, -- Truster power limit
       trusterAngle   :: Angle,      -- Truster angle
       batteryLevel   :: Battery     -- Current battery percentage
    }
@@ -40,20 +41,19 @@ initController = do
    timeNow <- getCurrentTime
    return $ Controller
       {
-         joystick          = Joystick (50, 50), -- centered
+         joystick          = Joystick (50, 0),  -- centered direction and zero power
          armed             = False,             -- controller off
          lastArmed         = timeNow,           -- can't arm within two seconds from now
          armPressed        = timeNow,           -- can't arm within two seconds from now
-         trusterPower      = 45,
-         trusterLimit      = High,
-         trusterAngle      = 270,
-         batteryLevel      = 100
+         trusterPower      = 0,                 -- No power
+         powerLimit      = High,               -- Max power available
+         trusterAngle      = 270,               -- Centered looking from top
+         batteryLevel      = 100                -- Batter is 100% at start
       }
 
 data Config       = Config
    {
       trusterMaxTurn  :: Int,        -- Maximum amount truster can turn left or right in degrees
-      powerLimit      :: PowerLimit, -- Max amount of power available (low, med, high)
       batteryLowLevel :: Battery,    -- Battery low level - restricts power
       batteryShutdown :: Battery     -- Battery shut down level - disarms controller
    }
@@ -64,7 +64,6 @@ initConfig = do
   return $ Config
     {
       trusterMaxTurn = 45,
-      powerLimit = High,
       batteryLowLevel = 10,
       batteryShutdown = 2
     }

@@ -4,9 +4,9 @@ module Main where
 import System.IO
 import Data.Time
 import Control.Monad
+import Control.Concurrent
 import Control.Monad.Reader
 import Control.Monad.State
-import Control.Concurrent
 import System.Console.ANSI
 import Data.Time (getCurrentTime)
 
@@ -14,17 +14,14 @@ import Truster
 import Controller
 import Configuration 
 
---- Main
--- main :: IO ()
 main = do
-  -- liftIO . putStrLn $ "Displaying Window"
-  -- forkIO $ display window background drawing 
   controller <- initController
   config <- initConfig
   setNoBuffering
   chan <- newChan
   forkIO $ castTick chan
   forkIO $ castKey chan
+  forkIO $ batteryTick chan
   liftIO . putStrLn $ "Running"
   runStateT (runReaderT (runController chan) config) controller
 
@@ -42,6 +39,12 @@ castTick :: Chan Event -> IO ()
 castTick chan = forever $ do
   threadDelay (10 ^ 5)
   writeChan chan TickEvent
+
+-- Reduce the batter by soem amount (depending omn power level) every tick
+batteryTick :: Chan Event -> IO ()
+batteryTick chan = forever $ do
+  threadDelay (3 * (10 ^ 6))
+  writeChan chan BatterDrop
 
 -- Read the keyboard
 castKey :: Chan Event -> IO ()

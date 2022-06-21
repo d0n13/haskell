@@ -22,6 +22,7 @@ executable haskell
                 Controller
                 Truster
                 Joystick
+                Battery
                 
 
     -- Modules included in this executable, other than Main.
