@@ -10,7 +10,7 @@ type Axis         = Int
 type Angle        = Int
 newtype Joystick  = Joystick { getPosition :: (Axis, Axis)} deriving Show
 data JoystickMove = U | D | L | R deriving Show
-data Armed        = On | Off deriving Show
+type ArmState     = Bool
 type Battery      = Int
 type PowerLevel   = Int
 data PowerLimit   = Low | Medium | High deriving Show
@@ -27,7 +27,7 @@ data Event
 data Controller   = Controller
    {
       joystick       :: Joystick,   -- Joystick axis (x,y) 0-100% 50% is center
-      armed          :: Bool,       -- On off switch, inputs have no response when not armed
+      armed          :: ArmState,   -- On off switch, inputs have no response when not armed
       lastArmed      :: UTCTime,    -- Time the arm button was last pressed. Arm or disarm must be debounced
       armPressed     :: UTCTime,    -- Time user presses arm
       trusterPower   :: PowerLevel, -- Truster power level 0-100%
@@ -54,7 +54,8 @@ initController = do
 data Config       = Config
    {
       trusterMaxTurn  :: Int,        -- Maximum amount truster can turn left or right in degrees
-      batteryLowLevel :: Battery,    -- Battery low level - restricts power
+      batteryMedLevel :: Battery,    -- Battery medium level - restricts truster power to MED
+      batteryLowLevel :: Battery,    -- Battery low level - restricts truster power to LOW
       batteryShutdown :: Battery     -- Battery shut down level - disarms controller
    }
    deriving Show
@@ -64,6 +65,7 @@ initConfig = do
   return $ Config
     {
       trusterMaxTurn = 45,
+      batteryMedLevel = 70,
       batteryLowLevel = 10,
-      batteryShutdown = 2
+      batteryShutdown = 5
     }
