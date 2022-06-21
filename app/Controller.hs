@@ -25,7 +25,7 @@ runController chan = forever $ do
   let armPressed_ = armPressed controller
   case event of
     -- Render screen on tick event
-    TickEvent   -> do 
+    TickEvent   -> do
       liftIO clearScreen
       adjustPower
       renderController
@@ -53,8 +53,8 @@ armController now = do
    let lastPressed = lastArmed controller       -- When was arm last pressed
    let diff = addUTCTime 2 lastPressed          -- add 2 seconds to when last pressed
    let diffOK = diff > now
-   if updateController diffOK then 
-      put (controller {armed = not isArmed, lastArmed = now}) 
+   if updateController diffOK then
+      put (controller {armed = not isArmed, lastArmed = now})
    else put controller
    where
       updateController True = True
@@ -69,7 +69,7 @@ moveJoystick direction = do
    if not _armed then
       return ()
    else
-      put (controller {joystick = Joystick (move direction _axis), 
+      put (controller {joystick = Joystick (move direction _axis),
                        trusterPower = snd _axis -- y controld power level
                        })
       where
@@ -92,21 +92,26 @@ adjustPower = do
    let powerLimit = getPowerLimit limit
    if power > powerLimit then
       put (controller { trusterPower = powerLimit})
-   else  
+   else
       put (controller { trusterPower = power})
 
 getPowerLimit :: PowerLimit -> PowerLevel
 getPowerLimit limit = do
-   case limit of 
+   case limit of
       Low      -> 25
       Medium   -> 70
-      High     -> 100  
+      High     -> 100
 
 -- Render Armed status
 renderArmed :: ScreenPos -> Bool -> IO ()
 renderArmed (row, col) armed = do
-  setCursorPosition row col
-  putStr $ "Armed: " ++ show armed
+  setCursorPosition row col; putStr "Armed: "
+  if armed then 
+     setSGR [SetColor Foreground Vivid Green] 
+  else 
+     setSGR [SetColor Foreground Dull Red]
+  setCursorPosition row (col + 7); putStr $ "" ++ show armed
+  setSGR [Reset]
 
 -- Instructions: 
 --           W
