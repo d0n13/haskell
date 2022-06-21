@@ -43,7 +43,7 @@ castTick chan = forever $ do
 -- Reduce the batter by soem amount (depending omn power level) every tick
 batteryTick :: Chan Event -> IO ()
 batteryTick chan = forever $ do
-  threadDelay (3 * (10 ^ 6))
+  threadDelay (3 * (10 ^ 5))
   writeChan chan BatterDrop
 
 -- Read the keyboard
