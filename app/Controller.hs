@@ -12,7 +12,7 @@ import Control.Concurrent
 import Configuration
 import Joystick
 import Truster
-import Battery (renderBattery, reduceBatteryLevel)
+import Battery
 
 -- Controller loop
 runController :: Chan Event -> ReaderT Config (StateT Controller IO) ()
@@ -33,6 +33,7 @@ runController chan = forever $ do
 
     BatterDrop  -> do
       reduceBatteryLevel
+      checkIfDisarmNeeded
       return ()
 
     KeyEvent k  -> do
@@ -103,15 +104,20 @@ getPowerLimit limit = do
       High     -> 100
 
 -- Render Armed status
-renderArmed :: ScreenPos -> Bool -> IO ()
+renderArmed :: ScreenPos -> ArmState -> IO ()
 renderArmed (row, col) armed = do
   setCursorPosition row col; putStr "Armed: "
-  if armed then 
-     setSGR [SetColor Foreground Vivid Green] 
-  else 
+  if armed then
+     setSGR [SetColor Foreground Vivid Green]
+  else
      setSGR [SetColor Foreground Dull Red]
-  setCursorPosition row (col + 7); putStr $ "" ++ show armed
+  setCursorPosition row (col + 7); putStr $ "" ++ showArmState armed
   setSGR [Reset]
+
+showArmState :: ArmState -> String
+showArmState state
+   | not state = "OFF"
+   | otherwise = "ON"
 
 -- Instructions: 
 --           W
@@ -131,6 +137,6 @@ renderController = do
   liftIO $ renderArmed (2,2) (armed controller)
   liftIO $ renderJoystick (4,2) (joystick controller)
   liftIO $ renderTruster (4,14) (trusterPower controller) (trusterAngle controller) (powerLimit controller)
-  liftIO $ renderBattery (4, 45) (batteryLevel controller)
+  liftIO $ renderBattery (4, 45) (batteryLevel controller) (batteryMedLevel config) (batteryLowLevel config)
   liftIO $ renderHelp (8, 2)
   return ()
