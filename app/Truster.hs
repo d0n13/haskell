@@ -3,20 +3,19 @@
 module Truster where
 
 import System.Console.ANSI
-import Control.Monad.State
 
 import Configuration
-import Joystick
 
+-- Render the truster info screen
 renderTruster :: ScreenPos -> PowerLevel -> Angle -> PowerLimit -> IO ()
 renderTruster (row, col) power angle limit = do
-  setCursorPosition row col; putStr $       "Truster Power : " ++ replicate (power `div` 10) '>'
+
+  setCursorPosition (row - 1) (col + 16); putStr $ "" ++ show power ++ "%"
+  setCursorPosition row col; putStr $       "Truster Power : " 
+
+  setSGR [SetColor Foreground Vivid Yellow]
+  setCursorPosition row (col + 16); putStr $ replicate (power `div` 10) '>'
+  setSGR [Reset]
+  
   setCursorPosition (row + 1) col; putStr $ "Truster Angle : " ++ show angle
   setCursorPosition (row + 2) col; putStr $ "Limit         : " ++ limitToString limit
-
-limitToString :: PowerLimit -> String
-limitToString limit = 
-   case limit of 
-      Low      -> "Low"
-      Medium   -> "Medium"
-      High     -> "High"
