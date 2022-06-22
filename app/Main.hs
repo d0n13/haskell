@@ -2,18 +2,15 @@
 module Main where
 
 import System.IO
-import Data.Time
-import Control.Monad
 import Control.Concurrent
 import Control.Monad.Reader
 import Control.Monad.State
 import System.Console.ANSI
-import Data.Time (getCurrentTime)
 
-import Truster
 import Controller
 import Configuration 
 
+-- Main Loop
 main = do
   controller <- initController
   config <- initConfig
@@ -25,9 +22,7 @@ main = do
   liftIO . putStrLn $ "Running"
   runStateT (runReaderT (runController chan) config) controller
 
---main = animate window azure (draw)
-
--- util
+-- disable screen buffering
 setNoBuffering :: IO ()
 setNoBuffering = do
   hSetBuffering stdin NoBuffering
@@ -43,7 +38,7 @@ castTick chan = forever $ do
 -- Reduce the batter by soem amount (depending omn power level) every tick
 batteryTick :: Chan Event -> IO ()
 batteryTick chan = forever $ do
-  threadDelay (3 * (10 ^ 5))
+  threadDelay (30 * (10 ^ 5)) -- 3 sec
   writeChan chan BatterDrop
 
 -- Read the keyboard
