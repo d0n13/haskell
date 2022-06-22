@@ -46,14 +46,14 @@ initController = do
          lastArmed         = timeNow,           -- can't arm within two seconds from now
          armPressed        = timeNow,           -- can't arm within two seconds from now
          trusterPower      = 0,                 -- No power
-         powerLimit      = High,               -- Max power available
+         powerLimit        = High,              -- Max power available
          trusterAngle      = 270,               -- Centered looking from top
          batteryLevel      = 100                -- Batter is 100% at start
       }
 
 data Config       = Config
    {
-      trusterMaxTurn  :: Int,        -- Maximum amount truster can turn left or right in degrees
+      trusterMaxTurn  :: Angle,      -- Maximum amount truster can turn left or right in degrees
       batteryMedLevel :: Battery,    -- Battery medium level - restricts truster power to MED
       batteryLowLevel :: Battery,    -- Battery low level - restricts truster power to LOW
       batteryShutdown :: Battery     -- Battery shut down level - disarms controller
@@ -66,6 +66,14 @@ initConfig = do
     {
       trusterMaxTurn = 45,
       batteryMedLevel = 70,
-      batteryLowLevel = 10,
+      batteryLowLevel = 20,
       batteryShutdown = 5
     }
+
+-- Convert the PowerLimit string into a string
+limitToString :: PowerLimit -> String
+limitToString limit = 
+   case limit of 
+      Low      -> "Low"
+      Medium   -> "Medium"
+      High     -> "High"
