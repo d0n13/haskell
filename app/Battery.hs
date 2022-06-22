@@ -27,7 +27,7 @@ reduceBatteryLevel = do
                 case limit of
                     Low     -> decBattery level 1
                     Medium  -> decBattery level 2
-                    High    -> decBattery level 3
+                    High    -> decBattery level 4
 
 -- Don't decrement battery lower than 0 
 decBattery :: Battery -> Int -> Battery
@@ -37,12 +37,25 @@ decBattery level decremntBy = do
     else 
         newVal
 
+-- If battery drops below setpoints then limit the truster power
+reducePowerAtSetpoints :: (MonadReader Config m, MonadState Controller m) => m ()
+reducePowerAtSetpoints = do
+    controller <- get
+    config <- ask
+    let level = batteryLevel controller
+    let medLevel = batteryMedLevel config
+    let lowLevel = batteryLowLevel config
+    case level of
+        x | x <= lowLevel   -> put (controller { powerLimit = Low } )
+        x | x <= medLevel   -> put (controller { powerLimit = Medium } )
+        _                   -> put (controller { powerLimit = High } )
+
 -- disarm controller if battery below shutdown value limit
 checkIfDisarmNeeded :: (MonadReader Config m, MonadState Controller m) => m ()
 checkIfDisarmNeeded = do
     controller <- get
     config <- ask
-    Control.Monad.when (batteryLevel controller < batteryShutdown config) $
+    when (batteryLevel controller < batteryShutdown config) $
         put (controller { armed = False } )
 
 -- Render battery info on screen
@@ -54,6 +67,7 @@ renderBattery (row, col) level battMedLevel battLowLevel = do
     setSGR [Reset]
     setCursorPosition (row + 1) (col + 9); putStr $ "" ++ show level ++ "%"
 
+-- Render the battery colour at different colours depending on battery level
 renderBatteryColor :: Battery -> Battery -> Battery -> IO ()
 renderBatteryColor level battMedLevel battLowLevel  = do
     case level of
