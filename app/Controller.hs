@@ -68,7 +68,6 @@ armController now = do
       updateController False = False
 
 -- Move Joystick
-
 moveJoystick :: (MonadReader Config m, MonadState Controller m, MonadIO m) => JoystickMove -> m ()
 moveJoystick direction = do
    config <- ask
@@ -117,8 +116,6 @@ adjustPower = do
    let powerLimit = getPowerLimit limit
 
    -- Map the joystick max range into powerLimit range
-
-
    if power > powerLimit then
       put (controller { trusterPower = powerLimit})
    else
