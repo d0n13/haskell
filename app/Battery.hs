@@ -74,3 +74,11 @@ renderBatteryColor level battMedLevel battLowLevel  = do
         x | x >= battMedLevel   -> setSGR [SetColor Foreground Vivid Green]
         x | x > battLowLevel    -> setSGR [SetColor Foreground Vivid Yellow]
         _                       -> setSGR [SetColor Foreground Vivid Red]
+
+-- Return the values for PowerLimit
+getPowerLimit :: PowerLimit -> PowerLevel
+getPowerLimit limit = do
+   case limit of
+      Low      -> 25
+      Medium   -> 70
+      High     -> 100

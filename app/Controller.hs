@@ -121,14 +121,6 @@ adjustPower = do
    else
       put (controller { trusterPower = power})
 
--- Return the values for PowerLimit
-getPowerLimit :: PowerLimit -> PowerLevel
-getPowerLimit limit = do
-   case limit of
-      Low      -> 25
-      Medium   -> 70
-      High     -> 100
-
 -- Render Armed status
 renderArmed :: ScreenPos -> ArmState -> IO ()
 renderArmed (row, col) armed = do

@@ -66,7 +66,7 @@ initConfig = do
     {
       trusterMaxTurn = 45,
       batteryMedLevel = 70,
-      batteryLowLevel = 20,
+      batteryLowLevel = 25,
       batteryShutdown = 5
     }
 
