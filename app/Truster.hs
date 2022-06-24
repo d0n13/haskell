@@ -17,5 +17,6 @@ renderTruster (row, col) power angle limit = do
   setCursorPosition row (col + 16); putStr $ replicate (power `div` 10) '>'
   setSGR [Reset]
   
-  setCursorPosition (row + 1) col; putStr $ "Truster Angle : " ++ show angle
-  setCursorPosition (row + 2) col; putStr $ "Limit         : " ++ limitToString limit
+  setCursorPosition (row + 1) col; putStr $ "        Limit : " ++ limitToString limit
+  setCursorPosition (row + 2) col; putStr $ "Truster Angle : " ++ show angle
+  
