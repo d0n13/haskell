@@ -1,7 +1,7 @@
 # Haskell project for batch-43
 This project is simulating a controller for an electric vehicle with trusters.
 
-<img width="480" alt="Sim Window" src="https://user-images.githubusercontent.com/5494992/175504960-434d4b52-624c-45d4-86e3-475758a05f74.png">
+<img width="480" alt="Sim Window" src="https://user-images.githubusercontent.com/5494992/175505636-6fe00a73-104b-430c-bb9c-2de0d2616eb5.png">
 
 Controls for simulated joystick and arm button are shown on screen.
 
