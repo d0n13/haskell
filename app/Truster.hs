@@ -18,5 +18,5 @@ renderTruster (row, col) power angle limit = do
   setSGR [Reset]
   
   setCursorPosition (row + 1) col; putStr $ "        Limit : " ++ limitToString limit
-  setCursorPosition (row + 2) col; putStr $ "Truster Angle : " ++ show angle
+  setCursorPosition (row + 2) col; putStr $ "     Rotation : " ++ show angle
   
